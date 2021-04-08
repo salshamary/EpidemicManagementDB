@@ -27,6 +27,22 @@ create table test(
     foreign key (lab_id) references laboratory(id)
 ) ;
 
+create table treatment(
+        s_id              char(9)         not null,
+        t_name            varchar(15)     not null,
+        p_ssn             char(9)         not null,
+    foreign key (p_ssn) references patient(ssn),
+    foreign key (s_id) references symptom(s_id)
+) ;
+
+create table symptom(
+        s_id              char(9)             not null,
+        s_name            char(9)             not null,
+
+    primary key (id)
+
+) ;
+
 INSERT INTO patient
 (fname, lname, ssn, dob, address, sex)
 values
@@ -56,5 +72,27 @@ values
 ('850846702', '2020-01-04', 'negative', '987654321', '543289700'),
 ('783472635', '2020-12-30', 'negative', '453453453', '365196362'),
 ('337518761', '2020-05-05', 'negative', '666884444', '532930356');
+
+INSERT INTO symptom
+(s_id, s_name)
+values
+('3324989', 'fever')
+('1112894', 'cough')
+('2910392', 'loss of smell')
+('2103921', 'shortness of breath')
+('3920493', 'bodyaches')
+('3004583', 'runny nose')
+('6549304', 'congestion')
+
+INSERT INTO treatment
+(s_id, t_name, p_ssn)
+values
+('3324989', 'tylenol', '888665555')
+('1112894', 'cough syrup', '123456789')
+('2910392', 'N/A', '453453453')
+('2103921', 'inhaler', '453453453')
+('3920493', 'advil', '666884444')
+('3004583', 'nyquil', '987654321')
+('6549304', 'musinex','888665555' )
 
 
