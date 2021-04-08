@@ -11,6 +11,8 @@ from wtforms.fields.html5 import DateField
 test_result = Test.query.with_entities(Test.result).distinct()
 patient_ssn = Patient.query.with_entities(Patient.ssn).distinct()
 lab_id = Laboratory.query.with_entities(Laboratory.id).distinct()
+symptom_id = Symptom.query.with_entities(Symptom.s_id).distinct()
+treatment_id = Treatment.query.with_entities(Treatment.t_id).distinct()
 #  or could have used ssns = db.session.query(Department.mgr_ssn).distinct()
 # for that way, we would have imported db from flaskDemo, see above
 
@@ -36,6 +38,19 @@ for row in lab_id:
     rowDict=row._asdict()
     l_results.append(rowDict)
 lab_choice = [(row['id'],row['id']) for row in l_results]
+
+#sympotm choices (select field)
+s_results = list()
+for row in symptom_id:
+    rowDict = row._asdict()
+    s_results.append(rowDict)
+symptom_choice = [(row['s_id'], row['s_id']) for row in s_results]
+
+t_results = list()
+for row in treatment_id:
+    rowDict = row._asdict()
+    t_results.append(rowDict)
+symptom_choice = [(row['t_id'], row['t_id']) for row in t_results]
 
 regex1='^((((19|20)(([02468][048])|([13579][26]))-02-29))|((20[0-9][0-9])|(19[0-9][0-9]))-((((0[1-9])'
 regex2='|(1[0-2]))-((0[1-9])|(1\d)|(2[0-8])))|((((0[13578])|(1[02]))-31)|(((0[1,3-9])|(1[0-2]))-(29|30)))))$'
@@ -119,6 +134,18 @@ class TestForm(FlaskForm):
     result=SelectField('Test Result', choices=test_Choices)
     p_ssn = SelectField('Patient SSN', choices=patient_choice)
     lab_id = SelectField('Lab ID', choices=lab_choice)
+    submit = SubmitField('Add this test.')
+
+class SymptomForm(FlaskForm):
+    s_id=IntegerField('Symptom ID', validators=[DataRequired()])
+    s_name=StringField('Symptom Name', validators=[DataRequired()])
+    submit = SubmitField('Add this test.')
+
+class TreatmentForm(FlaskForm):
+    t_id=IntegerField('Treatment ID', validators=[DataRequired()])
+    t_name =StringField('Treatment Name', validators=[DataRequired()])
+    s_id = SelectField('Symptom ID', choices=symptom_choice)
+    p_ssn = SelectField('Patient SSN', choices=patient_choice)
     submit = SubmitField('Add this test.')
             
 

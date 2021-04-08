@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
-from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, PatientForm, LabForm, TestForm
+from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, PatientForm, LabForm, TestForm, SymptomForm, TreatmentForm
 from flaskDemo.models import User, Post, Patient, Test, Laboratory, Symptom, Treatment
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
@@ -45,6 +45,17 @@ def test_home():
     posts = Test.query.all()
     return render_template('test_home.html', title='Home',outString=posts) 
 
+@app.route("/")
+@app.route("/home/symptom")
+def symptom_home():
+    posts = Symptom.query.all()
+    return render_template('symptom_home.html', title='Home',outString=posts)
+
+@app.route("/")
+@app.route("/home/treatment")
+def treatment_home():
+    posts = Treatment.query.all()
+    return render_template('treatment_home.html', title='Home',outString=posts) 
 
 @app.route("/about")
 def about():
@@ -162,6 +173,35 @@ def new_test():
         return redirect(url_for('home'))
     return render_template('create_test.html', title='New Test',
                            form=form, legend='New Test')
+
+@app.route("/")
+@app.route("/symptom/new", methods=['GET', 'POST'])
+@login_required
+def new_symptom():
+    form = SymptomForm()
+    if form.validate_on_submit():
+        symptom = Symptom(s_id=form.s_id.data, s_name=form.s_name.data)
+        db.session.add(symptom)
+        db.session.commit()
+        flash('You have added a new symptom!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_symptom.html', title='New Symptom',
+                           form=form, legend='New Symptom')
+
+@app.route("/")
+@app.route("/treatment/new", methods=['GET', 'POST'])
+@login_required
+def new_treatment():
+    form = TreatmentForm()
+    if form.validate_on_submit():
+        treatment = Treatment(t_id=form.t_id.data, t_name = form.t_name.data, s_id = form.s_id.data, p_ssn=form.p_ssn.data)
+        db.session.add(treatment)
+        db.session.commit()
+        flash('You have added a new treatment!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_treatment.html', title='New Treatment',
+                           form=form, legend='New Treatment')
+
 
 '''
 @app.route("/dept/new", methods=['GET', 'POST'])
