@@ -3,15 +3,14 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
-from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, DeptForm,DeptUpdateForm
-from flaskDemo.models import User, Post,Department, Dependent, Dept_Locations, Employee, Project, Works_On
+from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, PatientForm, LabForm, TestForm
+from flaskDemo.models import User, Post, Patient, Test, Laboratory, Symptom, Treatment
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
 
 
-@app.route("/")
-@app.route("/home")
-def home():
+
+'''def home():
     results = Department.query.all()
     return render_template('dept_home.html', outString = results)
     posts = Post.query.all()
@@ -21,9 +20,13 @@ def home():
                .join(Course, Course.courseID == Qualified.courseID).add_columns(Course.courseName)
     results = Faculty.query.join(Qualified,Faculty.facultyID == Qualified.facultyID) \
               .add_columns(Faculty.facultyID, Faculty.facultyName, Qualified.Datequalified, Qualified.courseID)
-    return render_template('join.html', title='Join',joined_1_n=results, joined_m_n=results2)
+    return render_template('join.html', title='Join',joined_1_n=results, joined_m_n=results2) '''
 
-   
+@app.route("/")
+@app.route("/home")
+def home():
+    results = Patient.query.all()
+    return render_template('home.html', title='Home', outstring=results)
 
 
 @app.route("/about")
@@ -102,7 +105,46 @@ def account():
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
 
+@app.route("/patient", methods=['GET', 'POST'])
+@login_required
+def new_patient():
+    form = PatientForm()
+    if form.validate_on_submit():
+        patient = Patient(ssn=form.ssn.data, name=form.name.data,dob=form.dob.data,address=form.address.data,sex=form.sex.data)
+        db.session.add(patient)
+        db.session.commit()
+        flash('You have added a new patient!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_patient.html', title='New Patient',
+                           form=form, legend='New Patient')
 
+@app.route("/lab", methods=['GET', 'POST'])
+@login_required
+def new_lab():
+    form = LabForm()
+    if form.validate_on_submit():
+        lab = Laboratory(id=form.id.data, name=form.name.data,location=form.location.data)
+        db.session.add(lab)
+        db.session.commit()
+        flash('You have added a new laboratory!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_lab.html', title='New Laboratory',
+                           form=form, legend='New Laboratory')
+
+@app.route("/test", methods=['GET', 'POST'])
+@login_required
+def new_test():
+    form = TestForm()
+    if form.validate_on_submit():
+        test = Test(id=form.id.data, date=form.date.data,result=form.result.data,p_ssn=form.p_ssn.data,lab_id=form.lab_id.data)
+        db.session.add(test)
+        db.session.commit()
+        flash('You have added a new test!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_test.html', title='New Test',
+                           form=form, legend='New Test')
+
+'''
 @app.route("/dept/new", methods=['GET', 'POST'])
 @login_required
 def new_dept():
@@ -158,4 +200,4 @@ def delete_dept(dnumber):
     db.session.delete(dept)
     db.session.commit()
     flash('The department has been deleted!', 'success')
-    return redirect(url_for('home'))
+    return redirect(url_for('home')) '''

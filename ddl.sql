@@ -1,7 +1,6 @@
 CREATE DATABASE EpidemicManagementSystem;
 create table patient(
-        fname             varchar(15)         not null,
-        lname             varchar(15)         not null,
+        name             varchar(15)         not null,
         ssn               char(9)             not null,
         dob               DATE                not null,
         address           varchar(30), 
@@ -37,7 +36,7 @@ create table symptom(
 ) ;
 
 
-create table treatment
+create table treatment(
         t_id              char(7)         not null,
         s_id              char(7)         not null,
         t_name            varchar(15)     not null,
@@ -48,16 +47,16 @@ create table treatment
 ) ;
 
 INSERT INTO patient
-(fname, lname, ssn, dob, address, sex)
+(name, ssn, dob, address, sex)
 values
-('James','Borg', '888665555', '1937-11-10', '450 Stone, Houston TX', 'M'),
-('John', 'Smith', '123456789', '1965-01-09', '731 Fondren, Houston TX', 'M'),
-('Franklin', 'Wong', '333445555', '1955-12-08', '638 Voss, Houston TX', 'M'),
-('Alicia', 'Zelaya', '999887777', '1968-01-19', '3321 Castle, Spring TX', 'F'),
-('Jennifer', 'Wallace', '987654321', '1941-06-20', '291 Berry, Bellaire TX', 'F'),
-('Ramesh', 'Narayan', '666884444', '1962-09-15', '975 Fire Oak, Humble TX', 'M'),
-('Joyce', 'English', '453453453', '1972-07-31', '5631 Rice, Houston TX', 'F'),
-('Ahmad', 'Jabbar', '987987987', '1969-03-29', '980 Dallas, Houston TX', 'M');
+('James Borg', '888665555', '1937-11-10', '450 Stone, Houston TX', 'M'),
+('John Smith', '123456789', '1965-01-09', '731 Fondren, Houston TX', 'M'),
+('Franklin Wong', '333445555', '1955-12-08', '638 Voss, Houston TX', 'M'),
+('Alicia Zelaya', '999887777', '1968-01-19', '3321 Castle, Spring TX', 'F'),
+('Jennifer Wallace', '987654321', '1941-06-20', '291 Berry, Bellaire TX', 'F'),
+('Ramesh Narayan', '666884444', '1962-09-15', '975 Fire Oak, Humble TX', 'M'),
+('Joyce English', '453453453', '1972-07-31', '5631 Rice, Houston TX', 'F'),
+('Ahmad Jabbar', '987987987', '1969-03-29', '980 Dallas, Houston TX', 'M');
 
 INSERT INTO laboratory
 (id, name, location)
@@ -89,7 +88,7 @@ values
 ('6549304', 'congestion');
 
 
-INSERT INTO treatment (
+INSERT INTO treatment
 (t_id, t_name, s_id, p_ssn)
 values
 ('3294802', 'tylenol', '3324989', '888665555'),

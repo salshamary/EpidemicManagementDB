@@ -5,19 +5,38 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextA
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError,Regexp
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flaskDemo import db
-from flaskDemo.models import User, Department, getDepartment, getDepartmentFactory
+from flaskDemo.models import User, Post, Patient, Laboratory, Test, Symptom, Treatment
 from wtforms.fields.html5 import DateField
 
-ssns = Department.query.with_entities(Department.mgr_ssn).distinct()
+test_result = Test.query.with_entities(Test.result).distinct()
+patient_ssn = Patient.query.with_entities(Patient.ssn).distinct()
+lab_id = Laboratory.query.with_entities(Laboratory.id).distinct()
 #  or could have used ssns = db.session.query(Department.mgr_ssn).distinct()
 # for that way, we would have imported db from flaskDemo, see above
 
-myChoices2 = [(row[0],row[0]) for row in ssns]  # change
+# myChoices2 = [(row[0],row[0]) for row in ssns]  # change
+
+# test choices (select field)
 results=list()
-for row in ssns:
+for row in test_result:
     rowDict=row._asdict()
     results.append(rowDict)
-myChoices = [(row['mgr_ssn'],row['mgr_ssn']) for row in results]
+test_Choices = [(row['result'],row['result']) for row in results]
+
+# patient choices (select field)
+p_results=list()
+for row in patient_ssn:
+    rowDict=row._asdict()
+    p_results.append(rowDict)
+patient_choice = [(row['ssn'],row['ssn']) for row in p_results]
+
+# lab choices (select field)
+l_results=list()
+for row in lab_id:
+    rowDict=row._asdict()
+    l_results.append(rowDict)
+lab_choice = [(row['id'],row['id']) for row in l_results]
+
 regex1='^((((19|20)(([02468][048])|([13579][26]))-02-29))|((20[0-9][0-9])|(19[0-9][0-9]))-((((0[1-9])'
 regex2='|(1[0-2]))-((0[1-9])|(1\d)|(2[0-8])))|((((0[13578])|(1[02]))-31)|(((0[1,3-9])|(1[0-2]))-(29|30)))))$'
 regex=regex1 + regex2
@@ -79,7 +98,31 @@ class PostForm(FlaskForm):
     content = TextAreaField('Content', validators=[DataRequired()])
     submit = SubmitField('Post')
 
-    
+
+class PatientForm(FlaskForm):
+    ssn=IntegerField('Social Security Number', validators=[DataRequired()])
+    name=StringField('Name', validators=[DataRequired()])
+    dob=DateField('Date of Birth', validators=[DataRequired()])
+    address=StringField('Address', validators=[DataRequired()])
+    sex=StringField('Sex', validators=[DataRequired()])
+    submit = SubmitField('Add this patient.')
+
+class LabForm(FlaskForm):
+    id=IntegerField('Lab ID', validators=[DataRequired()])
+    name=StringField('Name', validators=[DataRequired()])
+    location=StringField('Location', validators=[DataRequired()])
+    submit = SubmitField('Add this laboratory.')
+
+class TestForm(FlaskForm):
+    id=IntegerField('Test ID', validators=[DataRequired()])
+    date=DateField('Test Date', validators=[DataRequired()])
+    result=SelectField('Test Result', choices=test_Choices)
+    p_ssn = SelectField('Patient SSN', choices=patient_choice)
+    lab_id = SelectField('Lab ID', choices=lab_choice)
+    submit = SubmitField('Add this test.')
+            
+
+'''    
 class DeptUpdateForm(FlaskForm):
 
 #    dnumber=IntegerField('Department Number', validators=[DataRequired()])
@@ -118,4 +161,5 @@ class DeptForm(DeptUpdateForm):
         dept = Department.query.filter_by(dnumber=dnumber.data).first()
         if dept:
             raise ValidationError('That department number is taken. Please choose a different one.')
+            '''
 

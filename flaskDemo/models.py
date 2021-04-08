@@ -40,17 +40,26 @@ class Post(db.Model):
 
 
 
-class Dependent(db.Model):
-    __table__ = db.Model.metadata.tables['dependent']
+class Patient(db.Model):
+    __table__ = db.Model.metadata.tables['patient']
     
-class Department(db.Model):
-    __table__ = db.Model.metadata.tables['department']
+class Laboratory(db.Model):
+    __table__ = db.Model.metadata.tables['laboratory']
+
+class Test(db.Model):
+    __table__ = db.Model.metadata.tables['test']
+
+class Symptom(db.Model):
+    __table__ = db.Model.metadata.tables['symptom']
+
+class Treatment(db.Model):
+    __table__ = db.Model.metadata.tables['treatment']
 
 # used for query_factory
-def getDepartment(columns=None):
+''' def getDepartment(columns=None):
     u = Department.query
     if columns:
-        u = u.options(orm.load_only(*columns))
+       u = u.options(orm.load_only(*columns))
     return u
 
 def getDepartmentFactory(columns=None):
@@ -64,7 +73,8 @@ class Employee(db.Model):
 class Project(db.Model):
     __table__ = db.Model.metadata.tables['project']
 class Works_On(db.Model):
-    __table__ = db.Model.metadata.tables['works_on']
+    __table__ = db.Model.metadata.tables['works_on'] '''
+
 
     
 
