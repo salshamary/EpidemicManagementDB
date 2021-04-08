@@ -139,13 +139,14 @@ def update_dept(dnumber):
         db.session.commit()
         flash('Your department has been updated!', 'success')
         return redirect(url_for('dept', dnumber=dnumber))
-    elif request.method == 'GET':             
-        form.dnumber.data = dept.dnumber   # notice that we ARE passing the dnumber to the form
+    elif request.method == 'GET':              # notice we are not passing the dnumber to the form
+
+        form.dnumber.data = dept.dnumber
         form.dname.data = dept.dname
         form.mgr_ssn.data = dept.mgr_ssn
         form.mgr_start.data = dept.mgr_start
-    return render_template('update_dept.html', title='Update Department',
-                           form=form, legend='Update Department')          # note the update template!
+    return render_template('create_dept.html', title='Update Department',
+                           form=form, legend='Update Department')
 
 
 
