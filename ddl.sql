@@ -27,6 +27,7 @@ create table test(
     foreign key (lab_id) references laboratory(id)
 ) ;
 
+
 create table symptom(
         s_id              char(7)             not null,
         s_name            varchar(15)         not null,
@@ -35,7 +36,8 @@ create table symptom(
 
 ) ;
 
-create table treatment(
+
+create table treatment
         t_id              char(7)         not null,
         s_id              char(7)         not null,
         t_name            varchar(15)     not null,
@@ -87,7 +89,7 @@ values
 ('6549304', 'congestion');
 
 
-INSERT INTO treatment
+INSERT INTO treatment (
 (t_id, t_name, s_id, p_ssn)
 values
 ('3294802', 'tylenol', '3324989', '888665555'),
