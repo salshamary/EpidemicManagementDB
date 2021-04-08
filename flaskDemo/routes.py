@@ -25,8 +25,25 @@ from datetime import datetime
 @app.route("/")
 @app.route("/home")
 def home():
-    results = Patient.query.all()
-    return render_template('home.html', title='Home', outstring=results)
+    return render_template('home.html', title='Choose one of the following to view info.')
+
+@app.route("/")
+@app.route("/home/patient")
+def patient_home():
+    posts = Patient.query.all()
+    return render_template('patient_home.html', title='Home',outString=posts)
+
+@app.route("/")
+@app.route("/home/lab")
+def lab_home():
+    posts = Laboratory.query.all()
+    return render_template('lab_home.html', title='Home',outString=posts)
+
+@app.route("/")
+@app.route("/home/test")
+def test_home():
+    posts = Test.query.all()
+    return render_template('test_home.html', title='Home',outString=posts) 
 
 
 @app.route("/about")
@@ -105,7 +122,8 @@ def account():
     return render_template('account.html', title='Account',
                            image_file=image_file, form=form)
 
-@app.route("/patient", methods=['GET', 'POST'])
+@app.route("/")
+@app.route("/patient/new", methods=['GET', 'POST'])
 @login_required
 def new_patient():
     form = PatientForm()
@@ -118,7 +136,8 @@ def new_patient():
     return render_template('create_patient.html', title='New Patient',
                            form=form, legend='New Patient')
 
-@app.route("/lab", methods=['GET', 'POST'])
+@app.route("/")
+@app.route("/lab/new", methods=['GET', 'POST'])
 @login_required
 def new_lab():
     form = LabForm()
@@ -130,8 +149,8 @@ def new_lab():
         return redirect(url_for('home'))
     return render_template('create_lab.html', title='New Laboratory',
                            form=form, legend='New Laboratory')
-
-@app.route("/test", methods=['GET', 'POST'])
+@app.route("/")
+@app.route("/test/new", methods=['GET', 'POST'])
 @login_required
 def new_test():
     form = TestForm()
