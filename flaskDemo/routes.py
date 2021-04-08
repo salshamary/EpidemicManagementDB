@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskDemo import app, db, bcrypt
-from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, PatientForm, LabForm, TestForm
+from flaskDemo.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, PatientForm, LabForm, TestForm, PatientUpdateForm, LabUpdateForm, TestUpdateForm
 from flaskDemo.models import User, Post, Patient, Test, Laboratory, Symptom, Treatment
 from flask_login import login_user, current_user, logout_user, login_required
 from datetime import datetime
@@ -136,6 +136,47 @@ def new_patient():
     return render_template('create_patient.html', title='New Patient',
                            form=form, legend='New Patient')
 
+@app.route("/patient/<ssn>")
+@login_required
+def patient(ssn):
+    patient = Patient.query.get_or_404(ssn)
+    return render_template('patient.html', title=patient.ssn, patient=patient, now=datetime.utcnow())
+
+@app.route("/patient/<ssn>/update", methods=['GET', 'POST'])
+@login_required
+def update_patient(ssn):
+    patient = Patient.query.get_or_404(ssn)
+    currentPatient = patient.name
+
+    form = PatientUpdateForm()
+    if form.validate_on_submit():          # notice we are are not passing the dnumber from the form
+        if currentPatient !=form.name.data:
+            patient.name=form.name.data
+        patient.dob=form.dob.data
+        patient.address=form.address.data
+        patient.sex=form.sex.data
+        db.session.commit()
+        flash('Your patient has been updated!', 'success')
+        return redirect(url_for('patient', ssn=ssn))
+    elif request.method == 'GET':              # notice we are not passing the dnumber to the form
+
+        form.ssn.data = patient.ssn
+        form.name.data = patient.name
+        form.dob.data = patient.dob
+        form.address.data = patient.address
+        form.sex.data = patient.sex
+    return render_template('create_patient.html', title='Update Patient',
+                           form=form, legend='Update Patient')
+
+@app.route("/patient/<ssn>/delete", methods=['POST'])
+@login_required
+def delete_patient(ssn):
+    patient = Patient.query.get_or_404(ssn)
+    db.session.delete(patient)
+    db.session.commit()
+    flash('The patient has been deleted!', 'success')
+    return redirect(url_for('home'))
+
 @app.route("/")
 @app.route("/lab/new", methods=['GET', 'POST'])
 @login_required
@@ -149,6 +190,45 @@ def new_lab():
         return redirect(url_for('home'))
     return render_template('create_lab.html', title='New Laboratory',
                            form=form, legend='New Laboratory')
+
+@app.route("/lab/<id>")
+@login_required
+def lab(id):
+    laboratory = Laboratory.query.get_or_404(id)
+    return render_template('laboratory.html', title=laboratory.id, laboratory=laboratory, now=datetime.utcnow())
+
+@app.route("/lab/<id>/update", methods=['GET', 'POST'])
+@login_required
+def update_lab(id):
+    lab = Laboratory.query.get_or_404(id)
+    currentLab = lab.name
+
+    form = LabUpdateForm()
+    if form.validate_on_submit():          # notice we are are not passing the dnumber from the form
+        if currentLab !=form.name.data:
+            lab.name=form.name.data
+        lab.location=form.location.data
+        db.session.commit()
+        flash('Your laboratory has been updated!', 'success')
+        return redirect(url_for('lab', id=id))
+    elif request.method == 'GET':              # notice we are not passing the dnumber to the form
+
+        form.id.data = lab.id
+        form.name.data = lab.name
+        form.location.data = lab.location
+    return render_template('create_lab.html', title='Update Laboratory',
+                           form=form, legend='Update Laboratory')
+
+@app.route("/lab/<id>/delete", methods=['POST'])
+@login_required
+def delete_lab(id):
+    lab = Laboratory.query.get_or_404(id)
+    db.session.delete(lab)
+    db.session.commit()
+    flash('The laboratory has been deleted!', 'success')
+    return redirect(url_for('home'))
+
+
 @app.route("/")
 @app.route("/test/new", methods=['GET', 'POST'])
 @login_required
@@ -163,60 +243,46 @@ def new_test():
     return render_template('create_test.html', title='New Test',
                            form=form, legend='New Test')
 
-'''
-@app.route("/dept/new", methods=['GET', 'POST'])
+@app.route("/test/<id>")
 @login_required
-def new_dept():
-    form = DeptForm()
-    if form.validate_on_submit():
-        dept = Department(dname=form.dname.data, dnumber=form.dnumber.data,mgr_ssn=form.mgr_ssn.data,mgr_start=form.mgr_start.data)
-        db.session.add(dept)
-        db.session.commit()
-        flash('You have added a new department!', 'success')
-        return redirect(url_for('home'))
-    return render_template('create_dept.html', title='New Department',
-                           form=form, legend='New Department')
+def test(id):
+    test = Test.query.get_or_404(id)
+    return render_template('test.html', title=test.id, test=test, now=datetime.utcnow())
 
-
-@app.route("/dept/<dnumber>")
+@app.route("/test/<id>/update", methods=['GET', 'POST'])
 @login_required
-def dept(dnumber):
-    dept = Department.query.get_or_404(dnumber)
-    return render_template('dept.html', title=dept.dname, dept=dept, now=datetime.utcnow())
+def update_test(id):
+    test = Test.query.get_or_404(id)
+    currentTest = test.result
 
-
-@app.route("/dept/<dnumber>/update", methods=['GET', 'POST'])
-@login_required
-def update_dept(dnumber):
-    dept = Department.query.get_or_404(dnumber)
-    currentDept = dept.dname
-
-    form = DeptUpdateForm()
+    form = TestUpdateForm()
     if form.validate_on_submit():          # notice we are are not passing the dnumber from the form
-        if currentDept !=form.dname.data:
-            dept.dname=form.dname.data
-        dept.mgr_ssn=form.mgr_ssn.data
-        dept.mgr_start=form.mgr_start.data
+        if currentTest !=form.result.data:
+            test.result=test.result.data
+        test.date=form.date.data
+        test.p_ssn=form.p_ssn.data
+        test.lab_id=form.lab_id.data
         db.session.commit()
-        flash('Your department has been updated!', 'success')
-        return redirect(url_for('dept', dnumber=dnumber))
+        flash('Your test has been updated!', 'success')
+        return redirect(url_for('test', id=id))
     elif request.method == 'GET':              # notice we are not passing the dnumber to the form
 
-        form.dnumber.data = dept.dnumber
-        form.dname.data = dept.dname
-        form.mgr_ssn.data = dept.mgr_ssn
-        form.mgr_start.data = dept.mgr_start
-    return render_template('create_dept.html', title='Update Department',
-                           form=form, legend='Update Department')
+        form.id.data = test.id
+        form.date.data = test.date
+        form.result.data = test.result
+        form.p_ssn.data = test.p_ssn
+        form.lab_id.data = test.lab_id
+    return render_template('create_test.html', title='Update Test',
+                           form=form, legend='Update Test')
 
 
-
-
-@app.route("/dept/<dnumber>/delete", methods=['POST'])
+@app.route("/test/<id>/delete", methods=['POST'])
 @login_required
-def delete_dept(dnumber):
-    dept = Department.query.get_or_404(dnumber)
-    db.session.delete(dept)
+def delete_test(id):
+    test = Test.query.get_or_404(id)
+    db.session.delete(test)
     db.session.commit()
-    flash('The department has been deleted!', 'success')
-    return redirect(url_for('home')) '''
+    flash('The test has been deleted!', 'success')
+    return redirect(url_for('home'))
+
+
