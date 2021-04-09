@@ -63,7 +63,7 @@
 			<div class="form-group">
                 {{ form.lab_id.label(class="form-control-label") }}
                 {% if form.lab_id.errors %}
-                    {{ form.lab_id(class="form-control form-control-lg is-invalid") }}
+                    {{ form.lab_id(class_="form-control form-control-lg is-invalid") }}
                     <div class="invalid-feedback">
                         {% for error in form.lab_id.errors %}
                             <span>{{ error }}</span>

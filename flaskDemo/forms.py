@@ -43,14 +43,14 @@ lab_choice = [(row['id'],row['id']) for row in l_results]
 s_results = list()
 for row in symptom_id:
     rowDict = row._asdict()
-    s_results.append(rowDict)
+    results.append(rowDict)
 symptom_choice = [(row['s_id'], row['s_id']) for row in s_results]
 
 t_results = list()
 for row in treatment_id:
     rowDict = row._asdict()
-    t_results.append(rowDict)
-symptom_choice = [(row['t_id'], row['t_id']) for row in t_results]
+    results.append(rowDict)
+treatment_choice = [(row['t_id'], row['t_id']) for row in t_results]
 
 regex1='^((((19|20)(([02468][048])|([13579][26]))-02-29))|((20[0-9][0-9])|(19[0-9][0-9]))-((((0[1-9])'
 regex2='|(1[0-2]))-((0[1-9])|(1\d)|(2[0-8])))|((((0[13578])|(1[02]))-31)|(((0[1,3-9])|(1[0-2]))-(29|30)))))$'
@@ -147,6 +147,38 @@ class TreatmentForm(FlaskForm):
     s_id = SelectField('Symptom ID', choices=symptom_choice)
     p_ssn = SelectField('Patient SSN', choices=patient_choice)
     submit = SubmitField('Add this test.')
+
+class TreatmentUpdateForm(FlaskForm):
+
+#    dnumber=IntegerField('Department Number', validators=[DataRequired()])
+    t_id = HiddenField("")
+
+    t_name=StringField('Treatment Name:', validators=[DataRequired(),Length(max=30)])
+#  Commented out using a text field, validated with a Regexp.  That also works, but a hassle to enter ssn.
+#    mgr_ssn = StringField("Manager's SSN", validators=[DataRequired(),Regexp('^(?!000|666)[0-8][0-9]{2}(?!00)[0-9]{2}(?!0000)[0-9]{4}$', message="Please enter 9 digits for a social security.")])
+
+#  One of many ways to use SelectField or QuerySelectField.  Lots of issues using those fields!!
+    p_ssn = SelectField('Patient SSN', choices=patient_choice)
+    s_id = SelectField('Symptom ID', choices=symptom_choice)
+
+# got rid of def validate_dnumber
+
+    def validate_id(self, t_id):    # apparently in the company DB, dname is specified as unique
+         treatment = Treatment.query.filter_by(t_id=t_id.data).first()
+         if treatment and (str(treatment.t_id) != str(self.t_id.data)):
+             raise ValidationError('That Treatment already being exists. Please choose a different entry.')
+
+class TreatmentForm(TreatmentUpdateForm):
+
+    t_id=IntegerField('Treatment ID', validators=[DataRequired()])
+    submit = SubmitField('Add this Treatment.')
+
+    def validate_id(self, t_id):
+        treatment = Treatment.query.filter_by(t_id=t_id.data).first()
+        if treatment:
+            raise ValidationError('That treatment id already exists. Please try another entry')
+
+
             
 
 '''    
